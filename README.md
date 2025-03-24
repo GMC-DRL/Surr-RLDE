@@ -24,20 +24,9 @@ python main.py --run_experiments --problem bbob-surrogate
 ```
 For more adjustable settings, please refer to `main.py` and `config.py` for details.
 
-Recording results: Log files will be saved to `./outputs/logs/train/` . The saved checkpoints will be saved to `./outputs/model/train/`. The file structure is as follow:
+Recording results: Log files will be saved to `./outputs/train/` . The saved checkpoints will be saved to `./agent_model/train/`. The file structure is as follow:
 ```
-outputs
-|--logs
-   |--train
-      |--run_name
-         |--...
-|--models
-   |--train
-      |--run_name
-         |--Epoch
-            |--epoch1.pkl
-            |--epoch2.pkl
-            |--...
+
 ```
 
 ## Rollout
