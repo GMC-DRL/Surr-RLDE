@@ -102,11 +102,18 @@ class Surr_RLDE_Optimizer(Learnable_Optimizer):
 		#(-5,5)
 		self.population = self.population.to(self.device)
 
-		if problem.optimum is None:
+		if self.config.is_train:
 			self.fitness = problem.eval(self.population.clone())
-		else:
-			self.fitness = problem.eval(self.population.clone()) - problem.optimum
 
+		else:
+
+			if problem.optimum is None:
+				self.fitness = problem.eval(self.population.clone().cpu().numpy())
+			else:
+				self.fitness = problem.eval(self.population.clone().cpu().numpy()) - problem.optimum
+
+		if isinstance(self.fitness, np.ndarray):
+			self.fitness = torch.from_numpy(self.fitness).to(self.device)
 		if self.fitness.shape == (self.pop_size,):
 			self.fitness = self.fitness.unsqueeze(1)
 
@@ -181,10 +188,15 @@ class Surr_RLDE_Optimizer(Learnable_Optimizer):
 		mut_population = self.mutation(mut_way)
 		crossover_population = self.crossover(mut_population)
 
-		if problem.optimum is None:
+		if self.config.is_train:
 			temp_fit = problem.eval(crossover_population.clone())
 		else:
-			temp_fit = problem.eval(crossover_population.clone()) - problem.optimum
+
+			if problem.optimum is None:
+				temp_fit = problem.eval(crossover_population.clone().cpu().numpy())
+			else:
+				temp_fit = problem.eval(crossover_population.clone().cpu().numpy()) - problem.optimum
+
 
 		if isinstance(temp_fit, np.ndarray):
 			temp_fit = torch.from_numpy(temp_fit).to(self.device)
