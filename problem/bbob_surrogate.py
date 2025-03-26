@@ -9,8 +9,9 @@ class Kan_bbob_model(Basic_Problem):
 		shift = np.zeros(dim)
 		bias = 0
 		rotate = np.eye(dim)
+		model_path = config.model_path
 		self.instance = eval(f'F{func_id}')(dim=dim, shift=shift, rotate=rotate, bias=bias, lb=lb, ub=ub)
-		self.model = KAN.loadckpt(f'./problem/Surrogate_KAN/Dim10/fun_{self.instance}/model')
+		self.model = KAN.loadckpt(model_path+f'{self.instance}/model')
 		self.device = config.device
 		self.model.to(self.device)
 
@@ -42,8 +43,7 @@ class bbob_surrogate_Dataset(Dataset):
 		self.index = np.arange(self.N)
 
 	@staticmethod
-	def get_datasets(config, dim, train_id, test_id, upperbound=5, train_batch_size=1,
-					 test_batch_size=1,shifted=True, rotated=True, biased=True):
+	def get_datasets(config, dim, train_id, test_id, upperbound=5,shifted=True, rotated=True, biased=True):
 
 		# np.random.seed(4)
 		train_set = []
@@ -82,7 +82,7 @@ class bbob_surrogate_Dataset(Dataset):
 				test_instance = eval(f'F{id}')(dim=dim, shift=shift, rotate=H, bias=bias, lb=lb, ub=ub)
 				test_set.append(test_instance)
 
-		return bbob_surrogate_Dataset(train_set, train_batch_size), bbob_surrogate_Dataset(test_set, test_batch_size)
+		return bbob_surrogate_Dataset(train_set), bbob_surrogate_Dataset(test_set)
 
 	def __len__(self):
 		return self.N

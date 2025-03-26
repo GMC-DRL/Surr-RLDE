@@ -11,8 +11,7 @@ def construct_problem_set(config):
 	# 										  difficulty=config.difficulty)
 
 	if problem in ['bbob-surrogate']:
-		return bbob_surrogate.bbob_surrogate_Dataset.get_datasets(config=config, dim=config.dim, upperbound=config.upperbound, train_batch_size=config.train_batch_size,
-															test_batch_size=config.test_batch_size,
+		return bbob_surrogate.bbob_surrogate_Dataset.get_datasets(config=config, dim=config.dim, upperbound=config.upperbound,
 															train_id=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 																	20],
 															test_id=[16, 17, 18, 19, 21, 22, 23, 24],

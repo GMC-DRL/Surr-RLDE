@@ -210,14 +210,7 @@ def gen_overall_tab(results: dict, out_dir: str) -> None:
                               index=optimizers,
                               columns=multi_columns)
 
-    # calculate baseline1 cmaes
-    cmaes_obj = {}
-    for problem in problems:
-        blobj_problem = results['cost'][problem]['DEAP_CMAES']  # 51 * record_length
-        objs = []
-        for run in range(51):
-            objs.append(blobj_problem[run][-1])
-        cmaes_obj[problem] = sum(objs) / 51
+
 
     # calculate baseline2 random_search
     rs_obj = {}
@@ -239,7 +232,7 @@ def gen_overall_tab(results: dict, out_dir: str) -> None:
             std_obj = np.std(objs_)
             df_results.loc[optimizer, (problem, 'Obj')] = np.format_float_scientific(avg_obj, precision=3, exp_digits=1) + "(" + np.format_float_scientific(std_obj, precision=3, exp_digits=1) + ")"
             # calculate each Gap
-            df_results.loc[optimizer, (problem, 'Gap')] = "%.3f" % (1-(rs_obj[problem]-avg_obj) / (rs_obj[problem]-cmaes_obj[problem]+1e-10))
+            # df_results.loc[optimizer, (problem, 'Gap')] = "%.3f" % (1-(rs_obj[problem]-avg_obj) / (rs_obj[problem]-cmaes_obj[problem]+1e-10))
             fes_problem_optimizer = np.array(results['fes'][problem][optimizer])
             avg_fes = np.mean(fes_problem_optimizer)
             std_fes = np.std(fes_problem_optimizer)

@@ -7,6 +7,7 @@ import os
 import shutil
 import warnings
 warnings.filterwarnings("ignore")
+from train_surrogate.run_KAN import train_KAN_surrogate
 
 if __name__ == '__main__':
 
@@ -14,8 +15,15 @@ if __name__ == '__main__':
     assert ((config.train is not None) +
             (config.rollout is not None) +
             (config.test is not None) +
-            (config.run_experiment is not None)) == 1, \
-        'Among train, rollout, test, run_experiment, only one mode can be given at one time.'
+            (config.run_experiment is not None)+
+            (config.train_surrogate is not None)) == 1, \
+        'Among train_surrogate, train, rollout, test, run_experiment, only one mode can be given at one time.'
+
+    # train surrogate model
+    if config.train_surrogate:
+        torch.set_grad_enabled(True)
+        train_KAN_surrogate(config)
+
 
     # train
     if config.train:
