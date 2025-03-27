@@ -87,11 +87,24 @@ def construct_bbob_problem_set(func, dim, shift, bias, shifted, biased, rotated,
 
 
 def BBOB_Xy_Dataset(instance, n):
-	X = create_initial_sample(dim=instance.dim, sample_type='lhs', n=n,
+
+
+	x = create_initial_sample(dim=instance.dim, sample_type='lhs', n=n,
 							  lower_bound=instance.lb, upper_bound=instance.ub)
 	# Calculate the objective values of the initial sample using an arbitrary objective function
-	y = instance.func(X)
-	return X, y
+
+	if isinstance(x, list):
+		x = np.array(x, dtype=float)
+	if isinstance(x, pd.DataFrame):
+		x = x.values
+	if x.ndim == 1:
+		x = x.reshape(-1, instance.dim)
+	elif x.ndim == 2:
+		if x.shape[1] != instance.dim:
+			raise ValueError(f"Input x must have {instance.dim} columns, got {x.shape[1]} columns.")
+
+	y = instance.func(x)
+	return x, y
 
 
 def gen_KAN_dataset(train_loader, test_loader, device='cpu'):
@@ -126,7 +139,7 @@ def gen_KAN_dataset(train_loader, test_loader, device='cpu'):
 
 def normalize(train_X, train_y, test_X, test_y, instance):
 	data = torch.load(
-		f'./max_value/Dim{instance.dim}/{instance}/max_value.pth')
+		f'train_surrogate/max_value/Dim{instance.dim}/{instance}/max_value.pth')
 
 	max_value = data['max_value']
 

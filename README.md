@@ -28,8 +28,7 @@ The surrogate learning process can be activated via te command below
 python main.py --train_surrogate 
 ~~~
 
-The trained model will be saved to
-
+The trained model will be saved to`output/surrogate_model/`
 
 ### Policy Learning Stage
 
@@ -41,22 +40,36 @@ python main.py --run_experiments --problem bbob-surrogate
 
 For more adjustable settings, please refer to `main.py` and `config.py` for details.
 
-Recording results: Log files will be saved to `./outputs/train/` . The saved checkpoints will be saved to `./agent_model/train/`. The file structure is as follow:
+Recording results: Log files will be saved to `./output/train/` . The saved checkpoints will be saved to `./agent_model/train/`. The file structure is as follow:
 
 ```
-todo
+|--agent_model
+   |--train
+      |--Surr_RLDE_Agent
+         |--run_Name
+            |--checkpoint0.pkl
+            |--checkpoint1.pkl
+            |--...
+
+|--output
+   |--train
+      |--Surr_RLDE_Agent
+         |--runName
+            |--log
+            |--pic
 ```
 
-## Rollout
+## Test
 
-The rollout process can be easily activated via the command below.
+The test process can be easily activated via the command below. The defalt agent load path is `agent_model/test/`
 
 ```bash
-todo
+python main.py --test --agent_load_dir YourAgentDir --agent_for_cp Surr_RLDE_Agent --l_optimizer_for_cp Surr_RLDE_Optimizer 
+
 ```
 
-To use the test_model.pkl file located in the home directory as the target model, you can modify the command as follows:
+You can compare Surr-RLDE with DEDQN, DEDDQN, GLEET by adding them into the agent_for_cp and l_optimizer_for_cp
 
 ```bash
-todo 
+python main.py --test --agent_load_dir YourAgentDir --agent_for_cp Surr_RLDE_Agent DEDQN_Agent --l_optimizer_for_cp Surr_RLDE_Optimizer DEDQN_optimizer
 ```
