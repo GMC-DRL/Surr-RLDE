@@ -125,17 +125,13 @@ class Surr_RLDE_Optimizer(Learnable_Optimizer):
 		self.fit_history_best = torch.min(self.fitness).clone()
 
 		self.fes = self.pop_size
-		self.cost = [self.fit_cur_best.clone().cpu().item()]  # record the best cost of first generation
-		self.cur_logpoint = 1  # record the current logpoint
+		self.cost = [self.fit_cur_best.clone().cpu().item()]
+		self.cur_logpoint = 1
 		state = self.get_state(problem)
 
 		return state
 
 	def update(self, action, problem):
-		'''
-		F:0.1,0.5,0.9
-		mutation: rand1,best1,current-rand,current-pbest(p = 10%),currend-best
-		'''
 
 		if action == 0:
 			mut_way = 'DE/rand/1'
@@ -252,7 +248,7 @@ class Surr_RLDE_Optimizer(Learnable_Optimizer):
 			mut_population = v
 
 		elif mut_way == 'DE/best/1':
-			r = generate_random_int(self.pop_size, 2)  # Shape: [pop_size, 2]
+			r = generate_random_int(self.pop_size, 2)
 			a = self.population[r[:, 0]]
 			b = self.population[r[:, 1]]
 			v = self.pop_cur_best + self.F * (a - b)
@@ -260,7 +256,7 @@ class Surr_RLDE_Optimizer(Learnable_Optimizer):
 			mut_population = v
 
 		elif mut_way == 'DE/current-to-rand':
-			r = generate_random_int(self.pop_size, 3)  # Shape: [pop_size, 3]
+			r = generate_random_int(self.pop_size, 3)
 			a = self.population[r[:, 0]]
 			b = self.population[r[:, 1]]
 			c = self.population[r[:, 2]]
@@ -273,7 +269,7 @@ class Surr_RLDE_Optimizer(Learnable_Optimizer):
 			p_num = max(1, int(p * self.pop_size))
 			sorted_indices = torch.argsort(self.fitness.clone().flatten())
 			pbest_indices = sorted_indices[:p_num]
-			r = generate_random_int(self.pop_size, 2)  # Shape: [pop_size, 2]
+			r = generate_random_int(self.pop_size, 2)
 
 			a = self.population[r[:, 0]]
 			b = self.population[r[:, 1]]
@@ -286,7 +282,7 @@ class Surr_RLDE_Optimizer(Learnable_Optimizer):
 			mut_population = v
 
 		elif mut_way == 'DE/current-to-best':
-			r = generate_random_int(self.pop_size, 4)  # Shape: [pop_size, 4]
+			r = generate_random_int(self.pop_size, 4)
 			a = self.population[r[:, 0]]
 			b = self.population[r[:, 1]]
 			c = self.population[r[:, 2]]

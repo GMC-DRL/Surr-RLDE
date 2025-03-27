@@ -231,8 +231,6 @@ def gen_overall_tab(results: dict, out_dir: str) -> None:
             avg_obj = sum(objs_)/51
             std_obj = np.std(objs_)
             df_results.loc[optimizer, (problem, 'Obj')] = np.format_float_scientific(avg_obj, precision=3, exp_digits=1) + "(" + np.format_float_scientific(std_obj, precision=3, exp_digits=1) + ")"
-            # calculate each Gap
-            # df_results.loc[optimizer, (problem, 'Gap')] = "%.3f" % (1-(rs_obj[problem]-avg_obj) / (rs_obj[problem]-cmaes_obj[problem]+1e-10))
             fes_problem_optimizer = np.array(results['fes'][problem][optimizer])
             avg_fes = np.mean(fes_problem_optimizer)
             std_fes = np.std(fes_problem_optimizer)

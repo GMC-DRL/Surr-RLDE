@@ -38,32 +38,13 @@ class Surr_RLDE_Agent(Basic_Agent):
 
 		self.cur_checkpoint = 0
 
-		"""
-		Parameter
-		----------
-		config: An argparse. Namespace object for passing some core configurations such as max_learning_step.
-
-		Must To Do
-		----------
-		1. Save the model of initialized agent, which will be used in "rollout" to study the training process.
-		2. Initialize a counter to record the number of accumulated learned steps
-		3. Initialize a counter to record the current checkpoint of saving agent
-		"""
 		save_class(self.config.agent_save_dir, 'checkpoint0', self)  # save the model of initialized agent.
 		self.learned_steps = 0  # record the number of accumulated learned steps
 		self.learned_steps_history = 0
 		self.cur_checkpoint += 1  # record the current checkpoint of saving agent
 
 	def get_action(self, state, options=None):
-		"""
-		Parameter
-		----------
-		state: state features defined by developer.
 
-		Return
-		----------
-		action: the action inferenced by using state.
-		"""
 		state = torch.tensor(state).to(self.device)
 		action = None
 
@@ -78,34 +59,9 @@ class Surr_RLDE_Agent(Basic_Agent):
 
 
 	def train_episode(self, env):
-		""" Called by Trainer.
-			Optimize a problem instance in training set until reaching max_learning_step or satisfy the convergence condition.
-			During every train_episode,you need to train your own network.
-
-		Parameter
-		----------
-		env: an environment consisting of a backbone optimizer and a problem sampled from train set.
-
-		Must To Do
-		----------
-		1. record total reward
-		2. record current learning steps and check if reach max_learning_step
-		3. save agent model if checkpoint arrives
-
-		Return
-		----------
-		A boolean that is true when fes reaches max_learning_step otherwise false
-		A dict: {'normalizer': float,
-				 'gbest': float,
-				 'return': float,
-				 'learn_steps': int
-				 }
-		"""
-		# 更新一下epsilon 一个epoch更新一次
 		if self.learned_steps == 3136 or self.learned_steps - 3200 == self.learned_steps_history:
 			self.learned_steps_history = self.learned_steps
 			self.epsilon = self.epsilon - (0.5 - 0.05) / 468
-			# print(self.epsilon)
 
 		state = env.reset()
 		R = 0  # total reward
@@ -118,36 +74,22 @@ class Surr_RLDE_Agent(Basic_Agent):
 			self.replay_buffer.append(state, action, reward, next_state, is_done)
 			if len(self.replay_buffer) > self.warm_up_size:
 
-				# print('q')
 				batch_state, batch_action, batch_reward, batch_next_state, batch_done = self.replay_buffer.sample(self.batch_size)
-				# print(batch_state, batch_action, batch_reward, batch_next_state, batch_done)
-
-				# batch_state = batch_state.to(self.device)
-				# batch_action = batch_action.to(self.device)
-				# batch_reward = batch_reward.to(self.device)
-				# batch_next_state = batch_next_state.to(self.device)
-				# batch_done = batch_done.to(self.device)
-				# print(batch_done)
 				pred_Q = (self.pred_Qnet(batch_state)).gather(1, batch_action.unsqueeze(-1)).squeeze(-1)
-				# print(pred_Q.shape)
-				# target_Q = batch_reward + self.gamma * (1 - batch_done) * pred_Q
 
-				# Target Q values
 				with torch.no_grad():
 					max_actions = self.pred_Qnet(batch_next_state).argmax(dim=1)
 					target_q_values = self.target_Qnet(batch_next_state).gather(1, max_actions.unsqueeze(-1)).squeeze(-1)
 					targets = batch_reward + (self.gamma * target_q_values * (1 - batch_done))
 
-				# Loss and optimization
+
 				loss = self.criterion(pred_Q, targets)
 				self.optimizer.zero_grad()
 				loss.backward()
 				self.optimizer.step()
 				self.learned_steps += 1
-				# print(self.max_learning_step)
-				# print(self.cur_checkpoint,self.config.save_interval)
 
-				# save agent model if checkpoint arrives
+
 				if self.learned_steps >= (self.config.save_interval * self.cur_checkpoint):
 					save_class(self.config.agent_save_dir, 'checkpoint' + str(self.cur_checkpoint), self)
 					self.cur_checkpoint += 1
@@ -166,19 +108,7 @@ class Surr_RLDE_Agent(Basic_Agent):
 																	 'learn_steps': self.learned_steps}
 
 	def rollout_episode(self, env):
-		""" Called by method rollout and Tester.test
 
-		Parameter
-		----------
-		env: an environment consisting of a backbone optimizer and a problem sampled from test set
-
-		Return
-		----------
-		A dict: {'cost': list,
-		'fes': int,
-		'return': float
-		}
-		"""
 		state = env.reset()
 		is_done = False
 		R = 0  # total reward
